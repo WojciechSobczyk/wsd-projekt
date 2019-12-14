@@ -13,6 +13,7 @@ public class UserAgent extends Agent {
     protected void setup() {
         super.setup();
         initParameters();
+        System.out.println ("Tu agent " + getAID().getName()+ "!");
         addBehaviour(new Sender());
     }
 
@@ -26,10 +27,14 @@ public class UserAgent extends Agent {
     class Sender extends OneShotBehaviour {
         @Override
         public void action() {
+            //ACLMessage msg = new ACLMessage(ACLMessage .REQUEST);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(new AID("odbiorca", AID.ISLOCALNAME));
+            AID dest  =new AID("odbiorca", AID.ISLOCALNAME);//AID name umeszczamy nazwe agenta
+            msg.addReceiver(dest);
             msg.setLanguage("Polish");
             msg.setContent("Witaj");
+            //msg.setOntology("home−dictionary "); ontologia nie jest konieczna jesli system jest zamkniety
+            //msg. setReplyWith ("door_001" );
             send(msg);
         }
     }
