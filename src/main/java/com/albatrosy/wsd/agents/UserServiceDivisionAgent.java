@@ -1,5 +1,6 @@
 package com.albatrosy.wsd.agents;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -19,6 +20,11 @@ public class UserServiceDivisionAgent extends Agent {
             ACLMessage message = receive();
             if (message != null) {
                 System.out.println("Hello World");
+                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                AID dest  =new AID("Ver", AID.ISLOCALNAME);//do veryfikacji
+                String name = getAID().getName();
+                msg.addReceiver(dest);
+                send(msg);
             }
         }
     }

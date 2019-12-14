@@ -8,6 +8,7 @@ public class UserAgent extends Agent {
 
     private Long x;
     private Long y;
+    private int priority = 1;
 
     @Override
     protected void setup() {
@@ -30,9 +31,10 @@ public class UserAgent extends Agent {
             //ACLMessage msg = new ACLMessage(ACLMessage .REQUEST);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             AID dest  =new AID("odbiorca", AID.ISLOCALNAME);//AID name umeszczamy nazwe agenta
+            String name = getAID().getName();
             msg.addReceiver(dest);
             msg.setLanguage("Polish");
-            msg.setContent("Witaj");
+            msg.setContent(priority + " " + name);
             //msg.setOntology("home−dictionary "); ontologia nie jest konieczna jesli system jest zamkniety
             //msg. setReplyWith ("door_001" );
             send(msg);
