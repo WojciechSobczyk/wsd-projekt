@@ -28,8 +28,8 @@ public class AgentCreator extends Agent {
             @Override
             public void action() {
                 containerController = getContainerController();
-                createAgents(UserServiceDivisionAgent.class);
                 createAgents(UserAgent.class);
+                createAgents(UserServiceDivisionAgent.class);
             }
         });
     }
