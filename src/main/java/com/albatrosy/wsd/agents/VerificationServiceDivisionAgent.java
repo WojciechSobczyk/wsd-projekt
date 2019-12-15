@@ -10,6 +10,7 @@ import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -71,26 +72,13 @@ public class VerificationServiceDivisionAgent extends Agent {
         }
     }
 
-    private void vettingResponse(int aclMessageType, String userName, boolean exist) {
+    private void vettingResponse(int aclMessageType, String userName, boolean exist, AID sender) {
         ACLMessage msg = new ACLMessage(ACLMessage.CONFIRM);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
         UserVerdict userVerdict = new UserVerdict(userName, exist);
 
-        DFAgentDescription dfAgentDescription = new DFAgentDescription();
-        ServiceDescription serviceDescription = new ServiceDescription();
-        serviceDescription.setType(UserServiceDivisionAgent.AGENT_TYPE);
-        dfAgentDescription.addServices(serviceDescription);
-
-        try {
-            DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription);
-            for (DFAgentDescription addressee : addressees) {
-                msg.addReceiver(addressee.getName());
-            }
-        } catch (
-                FIPAException e) {
-            e.printStackTrace();
-        }
+        msg.addReceiver(sender);
         try {
             getContentManager().fillContent(msg, new Action(this.getAID(), userVerdict));
         } catch (Codec.CodecException |
@@ -116,14 +104,11 @@ public class VerificationServiceDivisionAgent extends Agent {
                         Optional<String> searchedUser = registeredUsers.stream()
                                 .filter(registeredUser -> registeredUser.equals(name))
                                 .findFirst();
-                        if(searchedUser.isPresent()) {
-                            vettingResponse(ACLMessage.CONFIRM, name, true);
-                            log.info("Uzytkownik " + name + " zweryfikowany pozytywnie");
-                        }
-                        else {
-                            vettingResponse(ACLMessage.DISCONFIRM, name, false);
-                            log.info("Uzytkownik " + name + " zweryfikowany negatywnie");
-                        }
+                        if (searchedUser.isPresent())
+                            vettingResponse(ACLMessage.CONFIRM, name, true, message.getSender());
+                        else
+                            vettingResponse(ACLMessage.DISCONFIRM, name, false, message.getSender());
+                        System.out.println("VerificationServiceDivisionAgent: User verification received");
                     }
                 } catch (OntologyException | Codec.CodecException e) {
                     e.printStackTrace();

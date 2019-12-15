@@ -51,6 +51,34 @@ public class UserServiceDivisionAgent extends Agent {
         }
     }
 
+    private void vettingCfp(ACLMessage message){
+        ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+        msg.setOntology(IncidentOntology.NAME);
+        msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+        UserDetails userDetails = new UserDetails(message.getSender().getLocalName());
+
+        DFAgentDescription dfAgentDescription = new DFAgentDescription();
+        ServiceDescription serviceDescription = new ServiceDescription();
+        serviceDescription.setType(VerificationServiceDivisionAgent.AGENT_TYPE);
+        dfAgentDescription.addServices(serviceDescription);
+
+        try{
+            DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription);
+            for(DFAgentDescription addressee : addressees){
+                msg.addReceiver(addressee.getName());
+            }
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+        try{
+            getContentManager().fillContent(msg, new Action(this.getAID(), userDetails));
+        } catch (Codec.CodecException | OntologyException e) {
+            e.printStackTrace();
+        }
+
+        send(msg);
+    }
+
     private void produceCard(UserVerdict userVerdict) {
         incidents.keySet()
                 .stream()
@@ -82,28 +110,22 @@ public class UserServiceDivisionAgent extends Agent {
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+        msg.addReceiver(message.getSender());
         UserDetails userDetails = new UserDetails(message.getSender().getLocalName());
-
-        DFAgentDescription dfAgentDescription = new DFAgentDescription();
-        ServiceDescription serviceDescription = new ServiceDescription();
-        serviceDescription.setType(VerificationServiceDivisionAgent.AGENT_TYPE);
-        dfAgentDescription.addServices(serviceDescription);
-
-        try{
-            DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription);
-            for(DFAgentDescription addressee : addressees){
-                msg.addReceiver(addressee.getName());
-            }
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }
-        try{
+        try {
             getContentManager().fillContent(msg, new Action(this.getAID(), userDetails));
         } catch (Codec.CodecException | OntologyException e) {
             e.printStackTrace();
         }
+        if(true) { //TODO: filter incidents queue
+            msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+        }
+        else{
+            msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
+        }
 
         send(msg);
+
     }
 
     private void sendUserIncidentCardToPriorityServiceDivisionAgent(UserCard userCard) {
@@ -144,6 +166,10 @@ public class UserServiceDivisionAgent extends Agent {
                     Concept action = ((Action) element).getAction();
                     if (action instanceof UserIncidentMessage) {
                         addIncident(message, (UserIncidentMessage) action);
+                        vettingCfp(message);
+                        System.out.println("Incident received");
+                    }
+                    if (action instanceof UserDetails && message.getPerformative() == ACLMessage.PROPOSE) {
                         vettingRequest(message);
                         log.info("System otrzymal zgloszenie incydentu");
                     }
