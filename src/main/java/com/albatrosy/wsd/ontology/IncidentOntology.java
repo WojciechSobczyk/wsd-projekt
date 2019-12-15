@@ -12,6 +12,9 @@ public class IncidentOntology extends Ontology {
 
     //UserCard
     public static final String USER_CARD = "UserCard";
+    public static final String USER_CARD_X = "x";
+    public static final String USER_CARD_Y = "y";
+    public static final String USER_CARD_NAME = "name";
     public static final String USER_CARD_DESCRIPTION = "description";
 
     //UserDetails
@@ -20,6 +23,7 @@ public class IncidentOntology extends Ontology {
 
     //UserIncidentMessage
     public static final String USER_INCIDENT_MESSAGE = "UserIncidentMessage";
+    public static final String USER_INCIDENT_MESSAGE_ID = "id";
     public static final String USER_INCIDENT_MESSAGE_X = "x";
     public static final String USER_INCIDENT_MESSAGE_Y = "y";
     public static final String USER_INCIDENT_MESSAGE_PRIORITY = "incidentPriority";
@@ -43,6 +47,9 @@ public class IncidentOntology extends Ontology {
         try {
             add(new ConceptSchema(USER_CARD), UserCard.class);
             ConceptSchema conceptSchemaUserCard = (ConceptSchema) getSchema(USER_CARD);
+            conceptSchemaUserCard.add(USER_CARD_X, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
+            conceptSchemaUserCard.add(USER_CARD_Y, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
+            conceptSchemaUserCard.add(USER_CARD_NAME, (PrimitiveSchema) getSchema(BasicOntology.STRING));
             conceptSchemaUserCard.add(USER_CARD_DESCRIPTION, (PrimitiveSchema) getSchema(BasicOntology.STRING));
 
             add(new ConceptSchema(USER_DETAILS), UserDetails.class);
@@ -51,6 +58,7 @@ public class IncidentOntology extends Ontology {
 
             add(new ConceptSchema(USER_INCIDENT_MESSAGE), UserIncidentMessage.class);
             ConceptSchema conceptSchemaUserIncidentMessage = (ConceptSchema) getSchema(USER_INCIDENT_MESSAGE);
+            conceptSchemaUserIncidentMessage.add(USER_INCIDENT_MESSAGE_ID, (PrimitiveSchema) getSchema(BasicOntology.STRING));
             conceptSchemaUserIncidentMessage.add(USER_INCIDENT_MESSAGE_X, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserIncidentMessage.add(USER_INCIDENT_MESSAGE_Y, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserIncidentMessage.add(USER_INCIDENT_MESSAGE_PRIORITY, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));

@@ -1,5 +1,8 @@
 package com.albatrosy.wsd.agents;
+
 import com.albatrosy.wsd.ontology.*;
+import jade.content.Concept;
+import jade.content.ContentElement;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
@@ -67,7 +70,7 @@ public class UserAgent extends Agent {
 
     }
 
-    private void reportIncident(){
+    private void reportIncident() {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
@@ -79,15 +82,15 @@ public class UserAgent extends Agent {
         serviceDescription.setType(UserServiceDivisionAgent.AGENT_TYPE);
         dfAgentDescription.addServices(serviceDescription);
 
-        try{
+        try {
             DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription); //TODO there is always one instance of UserServiceDivisionAgent, array is redundant
-            for(DFAgentDescription addressee : addressees){
+            for (DFAgentDescription addressee : addressees) {
                 msg.addReceiver(addressee.getName());
             }
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        try{
+        try {
             getContentManager().fillContent(msg, new Action(this.getAID(), incident));
         } catch (Codec.CodecException | OntologyException e) {
             e.printStackTrace();
@@ -95,6 +98,7 @@ public class UserAgent extends Agent {
 
         send(msg);
     }
+
     class Sender extends OneShotBehaviour {
         @Override
         public void action() {
@@ -113,8 +117,22 @@ public class UserAgent extends Agent {
         public void action() {
             ACLMessage message = receive();
             if (message != null) {
-                System.out.println("Trying to register incident");
-                reportIncident();
+                if (message.getContent() != null) {
+                    if (message.getContent().equals("incydent")) {
+                        reportIncident();
+                        System.out.println("Trying to register incident");
+                        return;
+                    }
+                }
+                try {
+                    ContentElement element = myAgent.getContentManager().extractContent(message);
+                    Concept action = ((Action) element).getAction();
+                    if (action instanceof UserCard) {
+                        System.out.println("Dostalem karte incydentu!!!");
+                    }
+                } catch (Codec.CodecException | OntologyException e) {
+                    e.getStackTrace();
+                }
             }
         }
     }

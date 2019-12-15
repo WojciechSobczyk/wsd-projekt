@@ -1,9 +1,6 @@
 package com.albatrosy.wsd.agents;
 
-import com.albatrosy.wsd.ontology.IncidentOntology;
-import com.albatrosy.wsd.ontology.UserDetails;
-import com.albatrosy.wsd.ontology.UserIncidentMessage;
-import com.albatrosy.wsd.ontology.UserVerdict;
+import com.albatrosy.wsd.ontology.*;
 import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.lang.Codec;
@@ -11,6 +8,7 @@ import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -20,15 +18,20 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 
+import java.util.*;
+
 public class UserServiceDivisionAgent extends Agent {
     public static final String AGENT_TYPE = "user_service_division_agent";
 
     Ontology ontology = IncidentOntology.getInstance();
+    private Map<AID, List<UserIncidentMessage>> incidents;
 
     @Override
     protected void setup() {
         super.setup();
         addBehaviour(new Receiver());
+
+        incidents = new HashMap<>();
 
         getContentManager().registerLanguage(new SLCodec(), FIPANames.ContentLanguage.FIPA_SL0);
         getContentManager().registerOntology(ontology);
@@ -44,6 +47,33 @@ public class UserServiceDivisionAgent extends Agent {
         } catch (FIPAException fe) {
             fe.printStackTrace();
         }
+    }
+
+    private void produceCard(UserVerdict userVerdict) {
+        incidents.keySet()
+                .stream()
+                .filter(key -> key.getLocalName().equals(userVerdict.getUserName()))
+                .findFirst()
+                .ifPresent(id -> {
+                    List<UserIncidentMessage> userIncidentMessageList = incidents.get(id);
+                    UserIncidentMessage lastUserIncidentMessage = userIncidentMessageList.get(userIncidentMessageList.size() - 1);
+                    if (userVerdict.getExist()) {
+                        UserCard userCard = new UserCard(lastUserIncidentMessage.getX(), lastUserIncidentMessage.getY(), userVerdict.getUserName(), "");
+                        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                        msg.setOntology(IncidentOntology.NAME);
+                        msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+                        msg.addReceiver(id);
+                        try{
+                            getContentManager().fillContent(msg, new Action(this.getAID(), userCard));
+                        } catch (Codec.CodecException | OntologyException e) {
+                            e.printStackTrace();
+                        }
+                        send(msg);
+                    }
+                    else {
+                        userIncidentMessageList.remove(userIncidentMessageList.size() - 1);
+                    }
+                });
     }
 
     private void vettingRequest(ACLMessage message) {
@@ -84,11 +114,13 @@ public class UserServiceDivisionAgent extends Agent {
                     ContentElement element = myAgent.getContentManager().extractContent(message);
                     Concept action = ((Action) element).getAction();
                     if (action instanceof UserIncidentMessage) {
+                        addIncident(message, (UserIncidentMessage) action);
                         vettingRequest(message);
                         System.out.println("Incident received");
                     }
                     if (action instanceof UserVerdict) {
                         UserVerdict userVerdict = (UserVerdict) action;
+                        produceCard(userVerdict);
                         System.out.println(userVerdict.getUserName() + ": " + userVerdict.getExist());
                     }
                 } catch (OntologyException | Codec.CodecException e) {
@@ -96,6 +128,16 @@ public class UserServiceDivisionAgent extends Agent {
                 }
             }
 
+        }
+    }
+
+    private void addIncident(ACLMessage message, UserIncidentMessage action) {
+        if (incidents.containsKey(message.getSender()))
+            incidents.get(message.getSender()).add(action);
+        else {
+            List<UserIncidentMessage> newUserIncidentMessageList = new ArrayList<>();
+            newUserIncidentMessageList.add(action);
+            incidents.put(message.getSender(), newUserIncidentMessageList);
         }
     }
 }
