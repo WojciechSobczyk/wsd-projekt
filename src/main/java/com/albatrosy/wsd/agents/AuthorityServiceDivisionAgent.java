@@ -1,11 +1,13 @@
 package com.albatrosy.wsd.agents;
 
-import com.albatrosy.wsd.ontology.AuthorityState;
-import com.albatrosy.wsd.ontology.IncidentOntology;
-import com.albatrosy.wsd.ontology.UserDetails;
-import com.albatrosy.wsd.ontology.UserLocation;
+import com.albatrosy.wsd.ontology.*;
+import jade.content.Concept;
+import jade.content.ContentElement;
+import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
+import jade.content.onto.OntologyException;
+import jade.content.onto.basic.Action;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -13,6 +15,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
+import jade.lang.acl.ACLMessage;
 
 public class AuthorityServiceDivisionAgent extends Agent {
 
@@ -61,11 +64,39 @@ public class AuthorityServiceDivisionAgent extends Agent {
         y = Long.parseLong(args[2].toString());
     }
 
+    private void sendApproval(ACLMessage message, UserCard userCard) {
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.setOntology(IncidentOntology.NAME);
+        msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+        msg.addReceiver(message.getSender());
+        double distance = Math.sqrt((userCard.getX() - x)^2 + (userCard.getY() - y)^2);
+        AuthorityIncidentParameters authorityIncidentParameters = new AuthorityIncidentParameters(distance);
+        try{
+            getContentManager().fillContent(msg, new Action(this.getAID(), authorityIncidentParameters));
+        } catch (Codec.CodecException | OntologyException e) {
+            e.printStackTrace();
+        }
+        send(msg);
+    }
+
     class Receiver extends CyclicBehaviour {
 
         @Override
         public void action() {
-
+            ACLMessage message = receive();
+            if (message != null) {
+                try {
+                    ContentElement element = myAgent.getContentManager().extractContent(message);
+                    Concept action = ((Action) element).getAction();
+                    if (action instanceof UserCard) {
+                        UserCard userCard = (UserCard) action;
+                        sendApproval(message, userCard);
+                        System.out.println("Incident received");
+                    }
+                } catch (OntologyException | Codec.CodecException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

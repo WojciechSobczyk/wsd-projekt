@@ -38,6 +38,10 @@ public class IncidentOntology extends Ontology {
     public static final String USER_VERDICT_EXIST = "exist";
     public static final String USER_VERDICT_USER_NAME = "userName";
 
+    //AuthorityIncidentParameters
+    public static final String AUTHORITY_INCIDENT_PARAMETERS = "AuthorityIncidentParameters";
+    public static final String AUTHORITY_INCIDENT_PARAMETERS_DISTANCE = "distance";
+
 
     public static Ontology instance = new IncidentOntology();
 
@@ -72,6 +76,10 @@ public class IncidentOntology extends Ontology {
             ConceptSchema conceptSchemaUserVerdict = (ConceptSchema) getSchema(USER_VERDICT);
             conceptSchemaUserVerdict.add(USER_VERDICT_EXIST, (PrimitiveSchema) getSchema(BasicOntology.BOOLEAN));
             conceptSchemaUserVerdict.add(USER_VERDICT_USER_NAME, (PrimitiveSchema) getSchema(BasicOntology.STRING));
+
+            add(new ConceptSchema(AUTHORITY_INCIDENT_PARAMETERS), AuthorityIncidentParameters.class);
+            ConceptSchema conceptSchemaAuthorityIncidentParameters = (ConceptSchema) getSchema(AUTHORITY_INCIDENT_PARAMETERS);
+            conceptSchemaAuthorityIncidentParameters.add(AUTHORITY_INCIDENT_PARAMETERS_DISTANCE, (PrimitiveSchema) getSchema(BasicOntology.FLOAT));
 
 
         } catch (OntologyException ontologyException) {
