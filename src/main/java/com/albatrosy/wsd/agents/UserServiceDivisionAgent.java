@@ -107,6 +107,10 @@ public class UserServiceDivisionAgent extends Agent {
     }
 
     private void vettingRequest(ACLMessage message) {
+        ACLMessage response = message;
+        response.clearAllReceiver();
+        response.addReceiver(message.getSender());
+        response.setSender(this.getAID());
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
@@ -118,13 +122,12 @@ public class UserServiceDivisionAgent extends Agent {
             e.printStackTrace();
         }
         if(true) { //TODO: filter incidents queue
-            msg.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            response.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
         }
         else{
-            msg.setPerformative(ACLMessage.REJECT_PROPOSAL);
+            response.setPerformative(ACLMessage.REJECT_PROPOSAL);
         }
-
-        send(msg);
+        send(response);
 
     }
 

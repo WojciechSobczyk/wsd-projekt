@@ -85,8 +85,16 @@ public class VerificationServiceDivisionAgent extends Agent {
                 OntologyException e) {
             e.printStackTrace();
         }
-
         send(msg);
+    }
+
+    private void vettingCfpResponse(ACLMessage message) {
+        ACLMessage response = message;
+        response.setPerformative(ACLMessage.PROPOSE);
+        response.clearAllReceiver();
+        response.addReceiver(message.getSender());
+        response.setSender(this.getAID());
+        send(response);
     }
 
     class Receiver extends CyclicBehaviour {
@@ -98,7 +106,7 @@ public class VerificationServiceDivisionAgent extends Agent {
                 try {
                     ContentElement element = myAgent.getContentManager().extractContent(message);
                     Concept action = ((Action) element).getAction();
-                    if (action instanceof UserDetails) {
+                    if (action instanceof UserDetails && message.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
                         UserDetails userDetails = (UserDetails) action;
                         String name = userDetails.getName();
                         Optional<String> searchedUser = registeredUsers.stream()
@@ -110,6 +118,10 @@ public class VerificationServiceDivisionAgent extends Agent {
                             vettingResponse(ACLMessage.DISCONFIRM, name, false, message.getSender());
                         System.out.println("VerificationServiceDivisionAgent: User verification received");
                     }
+                    if (action instanceof UserDetails && message.getPerformative() == ACLMessage.CFP) {
+                        vettingCfpResponse(message);
+                    }
+
                 } catch (OntologyException | Codec.CodecException e) {
                     e.printStackTrace();
                 }
@@ -117,3 +129,4 @@ public class VerificationServiceDivisionAgent extends Agent {
         }
     }
 }
+
