@@ -29,6 +29,11 @@ public class IncidentOntology extends Ontology {
     public static final String USER_LOCATION_X = "x";
     public static final String USER_LOCATION_Y = "y";
 
+    //UserVerdict
+    public static final String USER_VERDICT = "UserVerdict";
+    public static final String USER_VERDICT_EXIST = "exist";
+    public static final String USER_VERDICT_USER_NAME = "userName";
+
 
     public static Ontology instance = new IncidentOntology();
 
@@ -55,7 +60,10 @@ public class IncidentOntology extends Ontology {
             conceptSchemaUserLocation.add(USER_LOCATION_X, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserLocation.add(USER_LOCATION_Y, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
 
-
+            add(new ConceptSchema(USER_VERDICT), UserVerdict.class);
+            ConceptSchema conceptSchemaUserVerdict = (ConceptSchema) getSchema(USER_VERDICT);
+            conceptSchemaUserVerdict.add(USER_VERDICT_EXIST, (PrimitiveSchema) getSchema(BasicOntology.BOOLEAN));
+            conceptSchemaUserVerdict.add(USER_VERDICT_USER_NAME, (PrimitiveSchema) getSchema(BasicOntology.STRING));
 
 
         } catch (OntologyException ontologyException) {

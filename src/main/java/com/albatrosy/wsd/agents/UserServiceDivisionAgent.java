@@ -1,7 +1,9 @@
 package com.albatrosy.wsd.agents;
 
 import com.albatrosy.wsd.ontology.IncidentOntology;
+import com.albatrosy.wsd.ontology.UserDetails;
 import com.albatrosy.wsd.ontology.UserIncidentMessage;
+import com.albatrosy.wsd.ontology.UserVerdict;
 import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.lang.Codec;
@@ -44,6 +46,34 @@ public class UserServiceDivisionAgent extends Agent {
         }
     }
 
+    private void vettingRequest(ACLMessage message) {
+        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+        msg.setOntology(IncidentOntology.NAME);
+        msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+        UserDetails userDetails = new UserDetails(message.getSender().getLocalName());
+
+        DFAgentDescription dfAgentDescription = new DFAgentDescription();
+        ServiceDescription serviceDescription = new ServiceDescription();
+        serviceDescription.setType(VerificationServiceDivisionAgent.AGENT_TYPE);
+        dfAgentDescription.addServices(serviceDescription);
+
+        try{
+            DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription);
+            for(DFAgentDescription addressee : addressees){
+                msg.addReceiver(addressee.getName());
+            }
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+        try{
+            getContentManager().fillContent(msg, new Action(this.getAID(), userDetails));
+        } catch (Codec.CodecException | OntologyException e) {
+            e.printStackTrace();
+        }
+
+        send(msg);
+    }
+
     class Receiver extends CyclicBehaviour {
 
         @Override
@@ -54,7 +84,12 @@ public class UserServiceDivisionAgent extends Agent {
                     ContentElement element = myAgent.getContentManager().extractContent(message);
                     Concept action = ((Action) element).getAction();
                     if (action instanceof UserIncidentMessage) {
+                        vettingRequest(message);
                         System.out.println("Incident received");
+                    }
+                    if (action instanceof UserVerdict) {
+                        UserVerdict userVerdict = (UserVerdict) action;
+                        System.out.println(userVerdict.getUserName() + ": " + userVerdict.getExist());
                     }
                 } catch (OntologyException | Codec.CodecException e) {
                     e.printStackTrace();

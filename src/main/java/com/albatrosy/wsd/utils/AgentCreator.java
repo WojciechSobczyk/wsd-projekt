@@ -2,6 +2,7 @@ package com.albatrosy.wsd.utils;
 
 import com.albatrosy.wsd.agents.UserAgent;
 import com.albatrosy.wsd.agents.UserServiceDivisionAgent;
+import com.albatrosy.wsd.agents.VerificationServiceDivisionAgent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
@@ -30,6 +31,7 @@ public class AgentCreator extends Agent {
                 containerController = getContainerController();
                 createAgents(UserServiceDivisionAgent.class);
                 createAgents(UserAgent.class);
+                createAgents(VerificationServiceDivisionAgent.class);
             }
         });
     }
