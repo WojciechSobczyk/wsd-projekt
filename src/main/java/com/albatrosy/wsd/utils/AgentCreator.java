@@ -1,5 +1,6 @@
 package com.albatrosy.wsd.utils;
 
+import com.albatrosy.wsd.agents.AuthorityServiceDivisionAgent;
 import com.albatrosy.wsd.agents.UserAgent;
 import com.albatrosy.wsd.agents.UserServiceDivisionAgent;
 import com.albatrosy.wsd.agents.VerificationServiceDivisionAgent;
@@ -32,6 +33,7 @@ public class AgentCreator extends Agent {
                 createAgents(UserServiceDivisionAgent.class);
                 createAgents(UserAgent.class);
                 createAgents(VerificationServiceDivisionAgent.class);
+                createAgents(AuthorityServiceDivisionAgent.class);
             }
         });
     }
