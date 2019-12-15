@@ -74,8 +74,6 @@ public class UserAgent extends Agent {
         UserIncidentMessage incident = new UserIncidentMessage(userLocation.getX(), userLocation.getY(), IncidentPriority.HIGH); //TODO: smarter incident generation
         incidentMessages.add(incident);
 
-        AID receiver = new AID("UserServiceDivisionAgent", AID.ISLOCALNAME);
-
         DFAgentDescription dfAgentDescription = new DFAgentDescription();
         ServiceDescription serviceDescription = new ServiceDescription();
         serviceDescription.setType(UserServiceDivisionAgent.AGENT_TYPE);
@@ -90,7 +88,7 @@ public class UserAgent extends Agent {
             e.printStackTrace();
         }
         try{
-            getContentManager().fillContent(msg, new Action(receiver, incident));
+            getContentManager().fillContent(msg, new Action(this.getAID(), incident));
         } catch (Codec.CodecException | OntologyException e) {
             e.printStackTrace();
         }
