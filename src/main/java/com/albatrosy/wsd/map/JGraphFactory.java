@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class JGraphFactory  implements IGraphFactory {
+class JGraphFactory  implements IGraphFactory {
 
     private Randomizer randomizer;
     private String xMapSize;

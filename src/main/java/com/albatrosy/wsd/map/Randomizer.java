@@ -4,7 +4,7 @@ import lombok.Setter;
 
 import java.util.Random;
 
-public class Randomizer {
+class Randomizer {
     private Random random = new Random();
 
     @Setter

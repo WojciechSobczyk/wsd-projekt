@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
-public class JGraph implements IGraph {
+class JGraph implements IGraph {
     @Getter
     private SimpleWeightedGraph<Building, DefaultWeightedEdge> graph;
     private Randomizer randomizer;
