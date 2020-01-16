@@ -1,4 +1,4 @@
-package com.albatrosy.wsd.adapters;
+package com.albatrosy.wsd.map;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

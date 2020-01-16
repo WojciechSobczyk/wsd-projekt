@@ -1,15 +1,13 @@
-package com.albatrosy.wsd.adapters;
+package com.albatrosy.wsd.map;
 
+import com.albatrosy.wsd.ports.IGraph;
+import com.albatrosy.wsd.ports.IGraphPath;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
-import pl.sag.taxi.domain.common.Building;
-import pl.sag.taxi.domain.common.Randomizer;
-import pl.sag.taxi.ports.IGraph;
-import pl.sag.taxi.ports.IGraphPath;
 
 import java.util.Set;
 

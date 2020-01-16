@@ -1,9 +1,9 @@
-package com.albatrosy.wsd.adapters;
+package com.albatrosy.wsd.map;
 
+import com.albatrosy.wsd.ports.IGraphPath;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jgrapht.GraphPath;
-import pl.sag.taxi.ports.IGraphPath;
 
 @AllArgsConstructor
 @Getter

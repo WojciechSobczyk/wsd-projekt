@@ -1,5 +1,7 @@
 package com.albatrosy.wsd.agents;
 
+import com.albatrosy.wsd.map.Building;
+import com.albatrosy.wsd.map.CityMap;
 import com.albatrosy.wsd.ontology.*;
 import jade.content.Concept;
 import jade.content.ContentElement;
@@ -9,6 +11,7 @@ import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
@@ -17,7 +20,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import jade.core.Agent;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,10 @@ public class UserAgent extends Agent {
     private UserLocation userLocation;
     private List<UserIncidentMessage> incidentMessages = new ArrayList<>();
     private AID userServiceDivisionAgentAid;
+
+    @Autowired
+    private CityMap cityMap;
+    private Building position;
 
     private Long x;
     private Long y;
@@ -66,6 +73,7 @@ public class UserAgent extends Agent {
             throw new IllegalStateException("UserAgent must have two arguments");
 
         userDetails = new UserDetails(this.getName());
+        Building building = cityMap.getRandomBuilding();
         userLocation = new UserLocation(Long.parseLong(args[0].toString()), Long.parseLong(args[1].toString()));
 
     }

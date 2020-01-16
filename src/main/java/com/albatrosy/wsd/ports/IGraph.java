@@ -1,6 +1,6 @@
 package com.albatrosy.wsd.ports;
 
-import pl.sag.taxi.domain.common.Building;
+import com.albatrosy.wsd.map.Building;
 
 public interface IGraph {
     int getEdgeSize();

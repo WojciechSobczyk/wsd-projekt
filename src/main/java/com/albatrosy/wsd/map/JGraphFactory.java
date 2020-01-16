@@ -1,14 +1,13 @@
-package com.albatrosy.wsd.adapters;
+package com.albatrosy.wsd.map;
 
-import org.jgrapht.graph.*;
+import com.albatrosy.wsd.ports.IGraphFactory;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-import pl.sag.taxi.domain.common.Building;
-import pl.sag.taxi.domain.common.Randomizer;
-import pl.sag.taxi.ports.IGraphFactory;
 
 import java.util.ArrayList;
 import java.util.List;

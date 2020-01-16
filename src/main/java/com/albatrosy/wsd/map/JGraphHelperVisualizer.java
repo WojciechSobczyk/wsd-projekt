@@ -1,4 +1,4 @@
-package com.albatrosy.wsd.adapters;
+package com.albatrosy.wsd.map;
 
 import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.swing.mxGraphComponent;
@@ -7,7 +7,6 @@ import org.jgrapht.ListenableGraph;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultListenableGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import pl.sag.taxi.domain.common.Building;
 
 import javax.swing.*;
 import java.awt.*;
