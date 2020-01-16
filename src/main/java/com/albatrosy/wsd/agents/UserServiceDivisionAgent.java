@@ -17,9 +17,11 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import lombok.extern.log4j.Log4j;
 
 import java.util.*;
 
+@Log4j
 public class UserServiceDivisionAgent extends Agent {
     public static final String AGENT_TYPE = "user_service_division_agent";
 
@@ -116,12 +118,12 @@ public class UserServiceDivisionAgent extends Agent {
                     if (action instanceof UserIncidentMessage) {
                         addIncident(message, (UserIncidentMessage) action);
                         vettingRequest(message);
-                        System.out.println("Incident received");
+                        log.info("System otrzymal zgloszenie incydentu");
                     }
                     if (action instanceof UserVerdict) {
                         UserVerdict userVerdict = (UserVerdict) action;
                         produceCard(userVerdict);
-                        System.out.println(userVerdict.getUserName() + ": " + userVerdict.getExist());
+                        log.info("System produkuje karte incydentu");
                     }
                 } catch (OntologyException | Codec.CodecException e) {
                     e.printStackTrace();

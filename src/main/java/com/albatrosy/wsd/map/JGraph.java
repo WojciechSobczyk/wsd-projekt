@@ -9,6 +9,7 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
+import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -48,5 +49,13 @@ public class JGraph implements IGraph {
             counter++;
         }
         return null;
+    }
+
+    @Override
+    public Optional<Building> getBuilding(int x, int y) {
+        return graph.vertexSet()
+                .stream()
+                .filter((building) -> (building.getX() == x && building.getY() == building.getY()))
+                .findFirst();
     }
 }

@@ -67,7 +67,7 @@ public class IncidentOntology extends Ontology {
             conceptSchemaUserIncidentMessage.add(USER_INCIDENT_MESSAGE_Y, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserIncidentMessage.add(USER_INCIDENT_MESSAGE_PRIORITY, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
 
-            add(new ConceptSchema(USER_LOCATION), UserLocation.class);
+            add(new ConceptSchema(USER_LOCATION), Location.class);
             ConceptSchema conceptSchemaUserLocation = (ConceptSchema) getSchema(USER_LOCATION);
             conceptSchemaUserLocation.add(USER_LOCATION_X, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserLocation.add(USER_LOCATION_Y, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));

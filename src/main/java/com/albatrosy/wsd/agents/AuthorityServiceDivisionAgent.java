@@ -1,6 +1,9 @@
 package com.albatrosy.wsd.agents;
 
+import com.albatrosy.wsd.map.Building;
+import com.albatrosy.wsd.map.CityMap;
 import com.albatrosy.wsd.ontology.*;
+import com.albatrosy.wsd.ports.IGraphPath;
 import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.lang.Codec;
@@ -16,15 +19,16 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import lombok.extern.log4j.Log4j;
 
+import java.util.Optional;
+
+@Log4j
 public class AuthorityServiceDivisionAgent extends Agent {
-
     public static final String AGENT_TYPE = "authority_service_division_agent";
-
     private AuthorityState authorityState;
-    private Long x;
-    private Long y;
-
+    private Location location;
+    private CityMap cityMap = CityMap.getInstance();
     Ontology ontology = IncidentOntology.getInstance();
 
     @Override
@@ -48,20 +52,13 @@ public class AuthorityServiceDivisionAgent extends Agent {
         } catch (FIPAException fe) {
             fe.printStackTrace();
         }
+
+        log.info("Utworzono pracownika sluzb porzadkowych. Pozycja: " + location.toString());
     }
 
     private void initParameters() {
-        Object[] args = getArguments();
-        if (args.length != 3)
-            throw new IllegalStateException("UserAgent must have two arguments");
-
-        if (args[0].equals("BUSY"))
-            authorityState = AuthorityState.BUSY;
-        else
-            authorityState = AuthorityState.FREE;
-
-        x = Long.parseLong(args[1].toString());
-        y = Long.parseLong(args[2].toString());
+        Building building = cityMap.getRandomBuilding();
+        location = new Location( (long) building.getX(), (long) building.getY());
     }
 
     private void sendApproval(ACLMessage message, UserCard userCard) {
@@ -69,14 +66,20 @@ public class AuthorityServiceDivisionAgent extends Agent {
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
         msg.addReceiver(message.getSender());
-        double distance = Math.sqrt((userCard.getX() - x)^2 + (userCard.getY() - y)^2);
-        AuthorityIncidentParameters authorityIncidentParameters = new AuthorityIncidentParameters(distance);
-        try{
-            getContentManager().fillContent(msg, new Action(this.getAID(), authorityIncidentParameters));
-        } catch (Codec.CodecException | OntologyException e) {
-            e.printStackTrace();
+        Optional<Building> startOptional = cityMap.getBuilding(location.getX().intValue(), location.getY().intValue());
+        Optional<Building> stopOptional = cityMap.getBuilding(userCard.getX().intValue(), userCard.getY().intValue());
+        if (startOptional.isPresent() && stopOptional.isPresent()) {
+            IGraphPath graphPath = cityMap.getShortestPath(startOptional.get(), stopOptional.get());
+            double time = graphPath.getTime();
+            AuthorityIncidentParameters authorityIncidentParameters = new AuthorityIncidentParameters(time);
+            try {
+                getContentManager().fillContent(msg, new Action(this.getAID(), authorityIncidentParameters));
+            } catch (Codec.CodecException | OntologyException e) {
+                e.printStackTrace();
+            }
+            send(msg);
+            log.info("Moj czas na dojazd to: " +  time + " minut");
         }
-        send(msg);
     }
 
     class Receiver extends CyclicBehaviour {

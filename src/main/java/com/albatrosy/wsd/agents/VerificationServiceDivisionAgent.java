@@ -18,6 +18,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import lombok.extern.log4j.Log4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
+@Log4j
 public class VerificationServiceDivisionAgent extends Agent {
 
     public static final String AGENT_TYPE = "verification_service_division_agent";
@@ -115,11 +116,14 @@ public class VerificationServiceDivisionAgent extends Agent {
                         Optional<String> searchedUser = registeredUsers.stream()
                                 .filter(registeredUser -> registeredUser.equals(name))
                                 .findFirst();
-                        if(searchedUser.isPresent())
+                        if(searchedUser.isPresent()) {
                             vettingResponse(ACLMessage.CONFIRM, name, true);
-                        else
+                            log.info("Uzytkownik " + name + " zweryfikowany pozytywnie");
+                        }
+                        else {
                             vettingResponse(ACLMessage.DISCONFIRM, name, false);
-                        System.out.println("VerificationServiceDivisionAgent: User verification received");
+                            log.info("Uzytkownik " + name + " zweryfikowany negatywnie");
+                        }
                     }
                 } catch (OntologyException | Codec.CodecException e) {
                     e.printStackTrace();

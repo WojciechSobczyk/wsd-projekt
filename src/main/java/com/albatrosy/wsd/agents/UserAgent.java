@@ -20,26 +20,24 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j
 public class UserAgent extends Agent {
 
     public static final String AGENT_TYPE = "user_agent";
 
     private UserDetails userDetails;
-    private UserLocation userLocation;
+    private Location location;
     private List<UserIncidentMessage> incidentMessages = new ArrayList<>();
     private AID userServiceDivisionAgentAid;
 
-    @Autowired
-    private CityMap cityMap;
-    private Building position;
-
-    private Long x;
-    private Long y;
+    @Setter
+    private CityMap cityMap = CityMap.getInstance();
 
     Ontology ontology = IncidentOntology.getInstance();
 
@@ -65,24 +63,20 @@ public class UserAgent extends Agent {
         } catch (FIPAException fe) {
             fe.printStackTrace();
         }
+        log.info("Utworzono obywatela pozycja: " + location.toString());
     }
 
     private void initParameters() {
-        Object[] args = getArguments();
-        if (args.length != 2)
-            throw new IllegalStateException("UserAgent must have two arguments");
-
         userDetails = new UserDetails(this.getName());
         Building building = cityMap.getRandomBuilding();
-        userLocation = new UserLocation(Long.parseLong(args[0].toString()), Long.parseLong(args[1].toString()));
-
+        location = new Location((long) building.getX(), (long) building.getY());
     }
 
     private void reportIncident() {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
-        UserIncidentMessage incident = new UserIncidentMessage(userLocation.getX(), userLocation.getY(), IncidentPriority.HIGH); //TODO: smarter incident generation
+        UserIncidentMessage incident = new UserIncidentMessage(location.getX(), location.getY(), IncidentPriority.HIGH); //TODO: smarter incident generation
         incidentMessages.add(incident);
 
         DFAgentDescription dfAgentDescription = new DFAgentDescription();
@@ -128,7 +122,7 @@ public class UserAgent extends Agent {
                 if (message.getContent() != null) {
                     if (message.getContent().equals("incydent")) {
                         reportIncident();
-                        System.out.println("Trying to register incident");
+                        log.info("Nastapil incydent!");
                         return;
                     }
                 }
@@ -136,7 +130,7 @@ public class UserAgent extends Agent {
                     ContentElement element = myAgent.getContentManager().extractContent(message);
                     Concept action = ((Action) element).getAction();
                     if (action instanceof UserCard) {
-                        System.out.println("Dostalem karte incydentu!!!");
+                        log.info("Dostalem karte incydentu");
                     }
                 } catch (Codec.CodecException | OntologyException e) {
                     e.getStackTrace();

@@ -1,13 +1,14 @@
-package com.albatrosy.wsd.utils;
+package com.albatrosy.wsd;
 
 import com.albatrosy.wsd.agents.AuthorityServiceDivisionAgent;
 import com.albatrosy.wsd.agents.UserAgent;
 import com.albatrosy.wsd.agents.UserServiceDivisionAgent;
 import com.albatrosy.wsd.agents.VerificationServiceDivisionAgent;
+import com.albatrosy.wsd.map.CityMap;
+import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
-import jade.core.Agent;
 import jade.wrapper.StaleProxyException;
 
 import java.io.File;
@@ -22,6 +23,7 @@ public class AgentCreator extends Agent {
     private ClassLoader classLoader = AgentCreator.class.getClassLoader();
 
     public static final String separator = ";";
+    private CityMap cityMap = CityMap.getInstance();
 
 
     @Override
@@ -40,13 +42,12 @@ public class AgentCreator extends Agent {
 
     private void createAgents(Class className) {
         File agentsConfig = new File(classLoader.getResource(className.getSimpleName()).getFile());
-
         try (Scanner scanner = new Scanner(agentsConfig)) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] parameters = line.split(separator);
-
-                AgentController agentController = containerController.createNewAgent(parameters[0], className.getName(), Arrays.copyOfRange(parameters, 1, parameters.length));
+                AgentController agentController = containerController.createNewAgent
+                        (parameters[0], className.getName(), Arrays.copyOfRange(parameters, 1, parameters.length));
                 agentController.start();
             }
         } catch (FileNotFoundException | StaleProxyException e) {
