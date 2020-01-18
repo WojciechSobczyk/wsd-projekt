@@ -7,16 +7,18 @@ public class UserCard implements Concept {
     private Long x;
     private Long y;
     private String name;
+    private int priority;
     private String description;
 
     public UserCard() {
         this.description = "";
     }
 
-    public UserCard(Long x, Long y, String name, String description) {
+    public UserCard(Long x, Long y, String name, int priority, String description) {
         this.x = x;
         this.y = y;
         this.name = name;
+        this.priority = priority;
         this.description = description;
     }
 
@@ -50,5 +52,13 @@ public class UserCard implements Concept {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 }

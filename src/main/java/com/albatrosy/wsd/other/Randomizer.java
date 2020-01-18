@@ -1,10 +1,10 @@
-package com.albatrosy.wsd.map;
+package com.albatrosy.wsd.other;
 
 import lombok.Setter;
 
 import java.util.Random;
 
-class Randomizer {
+public class Randomizer {
     private Random random = new Random();
 
     @Setter

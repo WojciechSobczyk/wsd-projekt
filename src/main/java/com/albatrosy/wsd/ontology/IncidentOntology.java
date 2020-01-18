@@ -15,6 +15,7 @@ public class IncidentOntology extends Ontology {
     public static final String USER_CARD_X = "x";
     public static final String USER_CARD_Y = "y";
     public static final String USER_CARD_NAME = "name";
+    public static final String USER_CARD_PRIORITY = "priority";
     public static final String USER_CARD_DESCRIPTION = "description";
 
     //UserDetails
@@ -54,6 +55,7 @@ public class IncidentOntology extends Ontology {
             conceptSchemaUserCard.add(USER_CARD_X, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserCard.add(USER_CARD_Y, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserCard.add(USER_CARD_NAME, (PrimitiveSchema) getSchema(BasicOntology.STRING));
+            conceptSchemaUserCard.add(USER_CARD_PRIORITY, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserCard.add(USER_CARD_DESCRIPTION, (PrimitiveSchema) getSchema(BasicOntology.STRING));
 
             add(new ConceptSchema(USER_DETAILS), UserDetails.class);

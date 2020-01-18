@@ -77,7 +77,7 @@ public class AuthorityServiceDivisionAgent extends Agent {
             } catch (Codec.CodecException | OntologyException e) {
                 e.printStackTrace();
             }
-            send(msg);
+            //send(msg);
             log.info("Moj czas na dojazd to: " +  time + " minut");
         }
     }
@@ -94,7 +94,6 @@ public class AuthorityServiceDivisionAgent extends Agent {
                     if (action instanceof UserCard) {
                         UserCard userCard = (UserCard) action;
                         sendApproval(message, userCard);
-                        System.out.println("Incident received");
                     }
                 } catch (OntologyException | Codec.CodecException e) {
                     e.printStackTrace();

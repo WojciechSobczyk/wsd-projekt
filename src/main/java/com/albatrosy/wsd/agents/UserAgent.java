@@ -3,6 +3,7 @@ package com.albatrosy.wsd.agents;
 import com.albatrosy.wsd.map.Building;
 import com.albatrosy.wsd.map.CityMap;
 import com.albatrosy.wsd.ontology.*;
+import com.albatrosy.wsd.other.Descriptions;
 import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.lang.Codec;
@@ -73,17 +74,42 @@ public class UserAgent extends Agent {
     }
 
     private void reportIncident() {
+        ACLMessage msg = initializeMessage();
+        UserIncidentMessage incident = new UserIncidentMessage(location.getX(), location.getY(), IncidentPriority.HIGH); //TODO: smarter incident generation
+        incidentMessages.add(incident);
+        addUserServiceDivisionReceivers(msg);
+        try {
+            getContentManager().fillContent(msg, new Action(this.getAID(), incident));
+        } catch (Codec.CodecException | OntologyException e) {
+            e.printStackTrace();
+        }
+        send(msg);
+    }
+
+    private void sendUserIncidentCard (UserCard userCard) {
+        userCard.setDescription(Descriptions.randomDescription());
+        ACLMessage msg = initializeMessage();
+        addUserServiceDivisionReceivers(msg);
+        try {
+            getContentManager().fillContent(msg, new Action(this.getAID(), userCard));
+        } catch (Codec.CodecException | OntologyException e) {
+            e.printStackTrace();
+        }
+        send(msg);
+    }
+
+    private ACLMessage initializeMessage() {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
-        UserIncidentMessage incident = new UserIncidentMessage(location.getX(), location.getY(), IncidentPriority.HIGH); //TODO: smarter incident generation
-        incidentMessages.add(incident);
+        return msg;
+    }
 
+    private void addUserServiceDivisionReceivers(ACLMessage msg) {
         DFAgentDescription dfAgentDescription = new DFAgentDescription();
         ServiceDescription serviceDescription = new ServiceDescription();
         serviceDescription.setType(UserServiceDivisionAgent.AGENT_TYPE);
         dfAgentDescription.addServices(serviceDescription);
-
         try {
             DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription); //TODO there is always one instance of UserServiceDivisionAgent, array is redundant
             for (DFAgentDescription addressee : addressees) {
@@ -92,13 +118,6 @@ public class UserAgent extends Agent {
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        try {
-            getContentManager().fillContent(msg, new Action(this.getAID(), incident));
-        } catch (Codec.CodecException | OntologyException e) {
-            e.printStackTrace();
-        }
-
-        send(msg);
     }
 
     class Sender extends OneShotBehaviour {
@@ -131,6 +150,9 @@ public class UserAgent extends Agent {
                     Concept action = ((Action) element).getAction();
                     if (action instanceof UserCard) {
                         log.info("Dostalem karte incydentu");
+                        UserCard userCard = (UserCard) action;
+                        sendUserIncidentCard(userCard);
+                        log.info("Uzupelnilem opis incydentu: " + userCard.getDescription());
                     }
                 } catch (Codec.CodecException | OntologyException e) {
                     e.getStackTrace();

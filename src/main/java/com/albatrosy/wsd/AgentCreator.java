@@ -1,9 +1,6 @@
 package com.albatrosy.wsd;
 
-import com.albatrosy.wsd.agents.AuthorityServiceDivisionAgent;
-import com.albatrosy.wsd.agents.UserAgent;
-import com.albatrosy.wsd.agents.UserServiceDivisionAgent;
-import com.albatrosy.wsd.agents.VerificationServiceDivisionAgent;
+import com.albatrosy.wsd.agents.*;
 import com.albatrosy.wsd.map.CityMap;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -36,6 +33,7 @@ public class AgentCreator extends Agent {
                 createAgents(UserAgent.class);
                 createAgents(VerificationServiceDivisionAgent.class);
                 createAgents(AuthorityServiceDivisionAgent.class);
+                createAgents(PriorityServiceDivisionAgent.class);
             }
         });
     }

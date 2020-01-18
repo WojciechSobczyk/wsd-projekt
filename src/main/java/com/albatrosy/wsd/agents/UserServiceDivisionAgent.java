@@ -60,7 +60,7 @@ public class UserServiceDivisionAgent extends Agent {
                     List<UserIncidentMessage> userIncidentMessageList = incidents.get(id);
                     UserIncidentMessage lastUserIncidentMessage = userIncidentMessageList.get(userIncidentMessageList.size() - 1);
                     if (userVerdict.getExist()) {
-                        UserCard userCard = new UserCard(lastUserIncidentMessage.getX(), lastUserIncidentMessage.getY(), userVerdict.getUserName(), "");
+                        UserCard userCard = new UserCard(lastUserIncidentMessage.getX(), lastUserIncidentMessage.getY(), userVerdict.getUserName(), lastUserIncidentMessage.getIncidentPriority(), "");
                         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                         msg.setOntology(IncidentOntology.NAME);
                         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
@@ -106,6 +106,33 @@ public class UserServiceDivisionAgent extends Agent {
         send(msg);
     }
 
+    private void sendUserIncidentCardToPriorityServiceDivisionAgent(UserCard userCard) {
+        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+        msg.setOntology(IncidentOntology.NAME);
+        msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
+
+        DFAgentDescription dfAgentDescription = new DFAgentDescription();
+        ServiceDescription serviceDescription = new ServiceDescription();
+        serviceDescription.setType(PriorityServiceDivisionAgent.AGENT_TYPE);
+        dfAgentDescription.addServices(serviceDescription);
+
+        try{
+            DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription);
+            for(DFAgentDescription addressee : addressees){
+                msg.addReceiver(addressee.getName());
+            }
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+        try{
+            getContentManager().fillContent(msg, new Action(this.getAID(), userCard));
+        } catch (Codec.CodecException | OntologyException e) {
+            e.printStackTrace();
+        }
+
+        send(msg);
+    }
+
     class Receiver extends CyclicBehaviour {
 
         @Override
@@ -124,6 +151,11 @@ public class UserServiceDivisionAgent extends Agent {
                         UserVerdict userVerdict = (UserVerdict) action;
                         produceCard(userVerdict);
                         log.info("System produkuje karte incydentu");
+                    }
+                    if (action instanceof UserCard) {
+                        log.info("Odebralem karte incydentu");
+                        sendUserIncidentCardToPriorityServiceDivisionAgent(((UserCard) action));
+                        log.info("Wyslalem karte incydentu do PriorityServiceDivisionAgent");
                     }
                 } catch (OntologyException | Codec.CodecException e) {
                     e.printStackTrace();

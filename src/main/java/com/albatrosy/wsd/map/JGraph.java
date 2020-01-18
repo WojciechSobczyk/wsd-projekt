@@ -1,5 +1,6 @@
 package com.albatrosy.wsd.map;
 
+import com.albatrosy.wsd.other.Randomizer;
 import com.albatrosy.wsd.ports.IGraph;
 import com.albatrosy.wsd.ports.IGraphPath;
 import lombok.AllArgsConstructor;
@@ -55,7 +56,21 @@ class JGraph implements IGraph {
     public Optional<Building> getBuilding(int x, int y) {
         return graph.vertexSet()
                 .stream()
-                .filter((building) -> (building.getX() == x && building.getY() == building.getY()))
+                .filter((building) -> (building.getX() == x && building.getY() == y))
                 .findFirst();
+    }
+
+    public void print () {
+/*        double numberOfRowsAndColumns = Math.sqrt(getVertexSize());
+        for (int i = 0; i < numberOfRowsAndColumns; i++) {
+            if (getBuilding(0,i).isPresent() && getBuilding(0, i+1).isPresent()) {
+                int time = getShortestPath(getBuilding(0, i).get(), getBuilding(0, i + 1).get()).getTime();
+                System.out.print("[" + 0 + "," + i + "]--" + time + "--");
+            }
+            else {
+                System.out.println("[" + 0 + "," + i + "]");
+                System.out.print("  |    |");
+            }
+        }*/
     }
 }

@@ -10,4 +10,5 @@ public interface IGraph {
     IGraphPath getShortestPath(Building start, Building end);
     Building getRandomBuilding();
     Optional<Building> getBuilding(int x, int y);
+    void print();
 }

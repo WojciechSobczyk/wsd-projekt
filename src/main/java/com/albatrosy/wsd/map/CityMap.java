@@ -18,8 +18,10 @@ public class CityMap {
         if (INSTANCE == null) {
             IGraphFactory graphFactory = new JGraphFactory();
             INSTANCE = new CityMap(graphFactory.graph());
+            INSTANCE.graph.print();
         }
         return INSTANCE;
+
     }
 
     public IGraphPath getShortestPath(Building start, Building end) {

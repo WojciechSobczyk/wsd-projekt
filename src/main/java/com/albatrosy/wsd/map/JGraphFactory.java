@@ -1,5 +1,6 @@
 package com.albatrosy.wsd.map;
 
+import com.albatrosy.wsd.other.Randomizer;
 import com.albatrosy.wsd.ports.IGraphFactory;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
