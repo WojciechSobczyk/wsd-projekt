@@ -60,7 +60,7 @@ public class UserServiceDivisionAgent extends Agent {
                     List<UserIncidentMessage> userIncidentMessageList = incidents.get(id);
                     UserIncidentMessage lastUserIncidentMessage = userIncidentMessageList.get(userIncidentMessageList.size() - 1);
                     if (userVerdict.getExist()) {
-                        UserCard userCard = new UserCard(lastUserIncidentMessage.getX(), lastUserIncidentMessage.getY(), userVerdict.getUserName(), lastUserIncidentMessage.getIncidentPriority(), "");
+                        UserCard userCard = new UserCard(lastUserIncidentMessage.getId(), lastUserIncidentMessage.getX(), lastUserIncidentMessage.getY(), userVerdict.getUserName(), lastUserIncidentMessage.getIncidentPriority(), "");
                         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                         msg.setOntology(IncidentOntology.NAME);
                         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);

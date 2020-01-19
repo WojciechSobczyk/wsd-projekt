@@ -12,6 +12,7 @@ public class IncidentOntology extends Ontology {
 
     //UserCard
     public static final String USER_CARD = "UserCard";
+    public static final String USER_CARD_ID = "id";
     public static final String USER_CARD_X = "x";
     public static final String USER_CARD_Y = "y";
     public static final String USER_CARD_NAME = "name";
@@ -41,7 +42,9 @@ public class IncidentOntology extends Ontology {
 
     //AuthorityIncidentParameters
     public static final String AUTHORITY_INCIDENT_PARAMETERS = "AuthorityIncidentParameters";
-    public static final String AUTHORITY_INCIDENT_PARAMETERS_DISTANCE = "distance";
+    public static final String AUTHORITY_INCIDENT_PARAMETERS_INCIDENT_ID = "incidentId";
+    public static final String AUTHORITY_INCIDENT_PARAMETERS_TIME = "time";
+    public static final String AUTHORITY_INCIDENT_PARAMETERS_AUTHORITY_STATE = "authorityState";
 
 
     public static Ontology instance = new IncidentOntology();
@@ -52,6 +55,7 @@ public class IncidentOntology extends Ontology {
         try {
             add(new ConceptSchema(USER_CARD), UserCard.class);
             ConceptSchema conceptSchemaUserCard = (ConceptSchema) getSchema(USER_CARD);
+            conceptSchemaUserCard.add(USER_CARD_ID, (PrimitiveSchema) getSchema(BasicOntology.STRING));
             conceptSchemaUserCard.add(USER_CARD_X, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserCard.add(USER_CARD_Y, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
             conceptSchemaUserCard.add(USER_CARD_NAME, (PrimitiveSchema) getSchema(BasicOntology.STRING));
@@ -81,7 +85,9 @@ public class IncidentOntology extends Ontology {
 
             add(new ConceptSchema(AUTHORITY_INCIDENT_PARAMETERS), AuthorityIncidentParameters.class);
             ConceptSchema conceptSchemaAuthorityIncidentParameters = (ConceptSchema) getSchema(AUTHORITY_INCIDENT_PARAMETERS);
-            conceptSchemaAuthorityIncidentParameters.add(AUTHORITY_INCIDENT_PARAMETERS_DISTANCE, (PrimitiveSchema) getSchema(BasicOntology.FLOAT));
+            conceptSchemaAuthorityIncidentParameters.add(AUTHORITY_INCIDENT_PARAMETERS_INCIDENT_ID, (PrimitiveSchema) getSchema(BasicOntology.STRING));
+            conceptSchemaAuthorityIncidentParameters.add(AUTHORITY_INCIDENT_PARAMETERS_TIME, (PrimitiveSchema) getSchema(BasicOntology.FLOAT));
+            conceptSchemaAuthorityIncidentParameters.add(AUTHORITY_INCIDENT_PARAMETERS_AUTHORITY_STATE, (PrimitiveSchema) getSchema(BasicOntology.INTEGER));
 
 
         } catch (OntologyException ontologyException) {

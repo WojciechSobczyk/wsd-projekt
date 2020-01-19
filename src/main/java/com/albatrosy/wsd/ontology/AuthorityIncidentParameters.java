@@ -4,17 +4,41 @@ import jade.content.Concept;
 
 public class AuthorityIncidentParameters implements Concept {
 
-    private double distance;
+    private String incidentId;
+    private double time;
+    private int authorityState;
 
-    public AuthorityIncidentParameters(double distance) {
-        this.distance = distance;
+    public AuthorityIncidentParameters() {
+        incidentId = "";
     }
 
-    public double getDistance() {
-        return distance;
+    public AuthorityIncidentParameters(String incidentId, double time, int authorityState) {
+        this.incidentId = incidentId;
+        this.time = time;
+        this.authorityState = authorityState;
     }
 
-    public void setDistance(double distance) {
-        this.distance = distance;
+    public double getTime() {
+        return time;
+    }
+
+    public void setTime(double time) {
+        this.time = time;
+    }
+
+    public String getIncidentId() {
+        return incidentId;
+    }
+
+    public void setIncidentId(String incidentId) {
+        this.incidentId = incidentId;
+    }
+
+    public int getAuthorityState() {
+        return authorityState;
+    }
+
+    public void setAuthorityState(int authorityState) {
+        this.authorityState = authorityState;
     }
 }

@@ -4,6 +4,7 @@ import jade.content.Concept;
 
 public class UserCard implements Concept {
 
+    private String id;
     private Long x;
     private Long y;
     private String name;
@@ -14,12 +15,21 @@ public class UserCard implements Concept {
         this.description = "";
     }
 
-    public UserCard(Long x, Long y, String name, int priority, String description) {
+    public UserCard(String id, Long x, Long y, String name, int priority, String description) {
+        this.id = id;
         this.x = x;
         this.y = y;
         this.name = name;
         this.priority = priority;
         this.description = description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDescription() {

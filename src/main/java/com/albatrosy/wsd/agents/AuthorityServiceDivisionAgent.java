@@ -3,6 +3,7 @@ package com.albatrosy.wsd.agents;
 import com.albatrosy.wsd.map.Building;
 import com.albatrosy.wsd.map.CityMap;
 import com.albatrosy.wsd.ontology.*;
+import com.albatrosy.wsd.other.Randomizer;
 import com.albatrosy.wsd.ports.IGraphPath;
 import jade.content.Concept;
 import jade.content.ContentElement;
@@ -59,6 +60,15 @@ public class AuthorityServiceDivisionAgent extends Agent {
     private void initParameters() {
         Building building = cityMap.getRandomBuilding();
         location = new Location( (long) building.getX(), (long) building.getY());
+        Randomizer randomizer = new Randomizer();
+        randomizer.setMin(0);
+        randomizer.setMax(1);
+        if (randomizer.random() == 0) {
+            authorityState = AuthorityState.FREE;
+        }
+        else {
+            authorityState = AuthorityState.BUSY;
+        }
     }
 
     private void sendApproval(ACLMessage message, UserCard userCard) {
@@ -71,14 +81,14 @@ public class AuthorityServiceDivisionAgent extends Agent {
         if (startOptional.isPresent() && stopOptional.isPresent()) {
             IGraphPath graphPath = cityMap.getShortestPath(startOptional.get(), stopOptional.get());
             double time = graphPath.getTime();
-            AuthorityIncidentParameters authorityIncidentParameters = new AuthorityIncidentParameters(time);
+            AuthorityIncidentParameters authorityIncidentParameters = new AuthorityIncidentParameters(userCard.getId(), time, authorityState.getValue());
             try {
                 getContentManager().fillContent(msg, new Action(this.getAID(), authorityIncidentParameters));
             } catch (Codec.CodecException | OntologyException e) {
                 e.printStackTrace();
             }
-            //send(msg);
-            log.info("Moj czas na dojazd to: " +  time + " minut");
+            log.info("Moj czas na dojazd to: " +  time + " minut. " + "Aktualnie mam stan: " + authorityState.toString());
+            send(msg);
         }
     }
 
