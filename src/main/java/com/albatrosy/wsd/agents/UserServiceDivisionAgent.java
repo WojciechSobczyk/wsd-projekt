@@ -1,6 +1,8 @@
 package com.albatrosy.wsd.agents;
 
+import com.albatrosy.wsd.misc.IncidentMessageState;
 import com.albatrosy.wsd.ontology.*;
+import org.apache.commons.lang3.tuple.*;
 import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.lang.Codec;
@@ -26,7 +28,8 @@ public class UserServiceDivisionAgent extends Agent {
     public static final String AGENT_TYPE = "user_service_division_agent";
 
     Ontology ontology = IncidentOntology.getInstance();
-    private Map<AID, List<UserIncidentMessage>> incidents;
+    private Map<AID, Pair<IncidentMessageState, List<UserIncidentMessage>>> incidents;
+
 
     @Override
     protected void setup() {
@@ -34,6 +37,7 @@ public class UserServiceDivisionAgent extends Agent {
         addBehaviour(new Receiver());
 
         incidents = new HashMap<>();
+
 
         getContentManager().registerLanguage(new SLCodec(), FIPANames.ContentLanguage.FIPA_SL0);
         getContentManager().registerOntology(ontology);
@@ -75,7 +79,6 @@ public class UserServiceDivisionAgent extends Agent {
         } catch (Codec.CodecException | OntologyException e) {
             e.printStackTrace();
         }
-
         send(msg);
     }
 
@@ -85,7 +88,7 @@ public class UserServiceDivisionAgent extends Agent {
                 .filter(key -> key.getLocalName().equals(userVerdict.getUserName()))
                 .findFirst()
                 .ifPresent(id -> {
-                    List<UserIncidentMessage> userIncidentMessageList = incidents.get(id);
+                    List<UserIncidentMessage> userIncidentMessageList = incidents.get(id).getRight();
                     UserIncidentMessage lastUserIncidentMessage = userIncidentMessageList.get(userIncidentMessageList.size() - 1);
                     if (userVerdict.getExist()) {
                         UserCard userCard = new UserCard(lastUserIncidentMessage.getId(), lastUserIncidentMessage.getX(), lastUserIncidentMessage.getY(), userVerdict.getUserName(), lastUserIncidentMessage.getIncidentPriority(), "");
@@ -111,6 +114,23 @@ public class UserServiceDivisionAgent extends Agent {
         response.clearAllReceiver();
         response.addReceiver(message.getSender());
         response.setSender(this.getAID());
+
+        ContentElement element = null;
+        try {
+            element = getContentManager().extractContent(message);
+
+        } catch (Codec.CodecException | OntologyException e) {
+            e.printStackTrace();
+        }
+        Concept action = ((Action) element).getAction();
+        String name = ((UserDetails)action).getName();
+
+        AID aid = incidents.keySet()
+                .stream()
+                .filter(key -> key.getLocalName().equals(name))
+                .findFirst().get();
+
+        if(incidents.get(aid).getLeft().equals(IncidentMessageState.Initialized)) {
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
@@ -123,6 +143,7 @@ public class UserServiceDivisionAgent extends Agent {
         }
         if(true) { //TODO: filter incidents queue
             response.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            incidents.put(aid, new MutablePair<>(IncidentMessageState.WaitingForVerification, incidents.get(aid).getRight()));
         }
         else{
             response.setPerformative(ACLMessage.REJECT_PROPOSAL);
@@ -196,11 +217,12 @@ public class UserServiceDivisionAgent extends Agent {
 
     private void addIncident(ACLMessage message, UserIncidentMessage action) {
         if (incidents.containsKey(message.getSender()))
-            incidents.get(message.getSender()).add(action);
+            incidents.get(message.getSender()).getRight().add(action);
         else {
             List<UserIncidentMessage> newUserIncidentMessageList = new ArrayList<>();
             newUserIncidentMessageList.add(action);
-            incidents.put(message.getSender(), newUserIncidentMessageList);
+            incidents.put(message.getSender(), new MutablePair<>(IncidentMessageState.Initialized, newUserIncidentMessageList));
         }
+
     }
 }
