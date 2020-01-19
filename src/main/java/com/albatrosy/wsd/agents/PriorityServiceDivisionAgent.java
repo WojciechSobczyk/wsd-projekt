@@ -138,7 +138,8 @@ public class PriorityServiceDivisionAgent extends Agent {
                         authorityIncidentParametersMapForCurrentIncidentId.forEach((key, value) -> {
                             if (value.equals(findedAuthority)) {
                                 sendDecisionToAuthority();
-                                log.info("Do tego incydentu najlepszy bedzie: " + findedAuthority.getTime());
+                                log.info("Do tego incydentu najlepszy bedzie: " + key.getLocalName());
+                                log.info("Wyslano polecenie do straznika");
                             }
                         });
                     });
