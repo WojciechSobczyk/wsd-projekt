@@ -112,11 +112,13 @@ public class VerificationServiceDivisionAgent extends Agent {
                         Optional<String> searchedUser = registeredUsers.stream()
                                 .filter(registeredUser -> registeredUser.equals(name))
                                 .findFirst();
-                        if (searchedUser.isPresent())
+                        if (searchedUser.isPresent()) {
                             vettingResponse(ACLMessage.CONFIRM, name, true, message.getSender());
-                        else
+                            log.info("Zglaszajacy zweryfikowany pozytywnie");
+                        } else {
                             vettingResponse(ACLMessage.DISCONFIRM, name, false, message.getSender());
-                        System.out.println("VerificationServiceDivisionAgent: User verification received");
+                            log.info("Zglaszajacy zweryfikowany negatywnie");
+                        }
                     }
                     if (action instanceof UserDetails && message.getPerformative() == ACLMessage.CFP) {
                         vettingCfpResponse(message);

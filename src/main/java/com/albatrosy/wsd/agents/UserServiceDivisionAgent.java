@@ -55,7 +55,7 @@ public class UserServiceDivisionAgent extends Agent {
         }
     }
 
-    private void vettingCfp(ACLMessage message){
+    private void vettingCfp(ACLMessage message) {
         ACLMessage msg = new ACLMessage(ACLMessage.CFP);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
@@ -66,15 +66,15 @@ public class UserServiceDivisionAgent extends Agent {
         serviceDescription.setType(VerificationServiceDivisionAgent.AGENT_TYPE);
         dfAgentDescription.addServices(serviceDescription);
 
-        try{
+        try {
             DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription);
-            for(DFAgentDescription addressee : addressees){
+            for (DFAgentDescription addressee : addressees) {
                 msg.addReceiver(addressee.getName());
             }
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        try{
+        try {
             getContentManager().fillContent(msg, new Action(this.getAID(), userDetails));
         } catch (Codec.CodecException | OntologyException e) {
             e.printStackTrace();
@@ -96,14 +96,13 @@ public class UserServiceDivisionAgent extends Agent {
                         msg.setOntology(IncidentOntology.NAME);
                         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
                         msg.addReceiver(id);
-                        try{
+                        try {
                             getContentManager().fillContent(msg, new Action(this.getAID(), userCard));
                         } catch (Codec.CodecException | OntologyException e) {
                             e.printStackTrace();
                         }
                         send(msg);
-                    }
-                    else {
+                    } else {
                         userIncidentMessageList.remove(userIncidentMessageList.size() - 1);
                     }
                 });
@@ -123,14 +122,13 @@ public class UserServiceDivisionAgent extends Agent {
             e.printStackTrace();
         }
         Concept action = ((Action) element).getAction();
-        String name = ((UserDetails)action).getName();
+        String name = ((UserDetails) action).getName();
 
         AID aid = incidents.keySet()
                 .stream()
                 .filter(key -> key.getLocalName().equals(name))
                 .findFirst().get();
 
-        if(incidents.get(aid).getLeft().equals(IncidentMessageState.Initialized)) {
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.setOntology(IncidentOntology.NAME);
         msg.setLanguage(FIPANames.ContentLanguage.FIPA_SL0);
@@ -141,15 +139,18 @@ public class UserServiceDivisionAgent extends Agent {
         } catch (Codec.CodecException | OntologyException e) {
             e.printStackTrace();
         }
-        if(true) { //TODO: filter incidents queue
+//            if (true) { //TODO: filter incidents queue
+        if (incidents.get(aid).getLeft().equals(IncidentMessageState.Initialized)) {
             response.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
             incidents.put(aid, new MutablePair<>(IncidentMessageState.WaitingForVerification, incidents.get(aid).getRight()));
-        }
-        else{
+            log.info("Zaakcpetowano propozycje weryfikacji zglaszajacego");
+        } else {
             response.setPerformative(ACLMessage.REJECT_PROPOSAL);
+            log.info("Odrzucono propozycje weryfikacji zglaszajacego");
         }
         send(response);
 
+//        }
     }
 
     private void sendUserIncidentCardToPriorityServiceDivisionAgent(UserCard userCard) {
@@ -162,15 +163,15 @@ public class UserServiceDivisionAgent extends Agent {
         serviceDescription.setType(PriorityServiceDivisionAgent.AGENT_TYPE);
         dfAgentDescription.addServices(serviceDescription);
 
-        try{
+        try {
             DFAgentDescription[] addressees = DFService.search(this, dfAgentDescription);
-            for(DFAgentDescription addressee : addressees){
+            for (DFAgentDescription addressee : addressees) {
                 msg.addReceiver(addressee.getName());
             }
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        try{
+        try {
             getContentManager().fillContent(msg, new Action(this.getAID(), userCard));
         } catch (Codec.CodecException | OntologyException e) {
             e.printStackTrace();
@@ -191,11 +192,11 @@ public class UserServiceDivisionAgent extends Agent {
                     if (action instanceof UserIncidentMessage) {
                         addIncident(message, (UserIncidentMessage) action);
                         vettingCfp(message);
-                        System.out.println("Incident received");
+                        log.info("Otrzymano zgloszenie incydentu");
                     }
                     if (action instanceof UserDetails && message.getPerformative() == ACLMessage.PROPOSE) {
                         vettingRequest(message);
-                        log.info("System otrzymal zgloszenie incydentu");
+                        log.info("Otrzymano propozycje weryfikacji zglaszajacego");
                     }
                     if (action instanceof UserVerdict) {
                         UserVerdict userVerdict = (UserVerdict) action;
@@ -226,3 +227,5 @@ public class UserServiceDivisionAgent extends Agent {
 
     }
 }
+
+
